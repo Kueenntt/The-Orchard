@@ -94,10 +94,59 @@
         </div>
     </footer>
 
-<script>
-    // --- JAVASCRIPT FOR SINGLE-PAGE APPLICATION ROUTING ---
+<script type="module">
+    // --- JAVASCRIPT FOR SINGLE-PAGE APPLICATION ROUTING & FIREBASE INTEGRATION ---
+    
+    // 1. Firebase Imports (must be first inside the script for modules)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+
     const appContent = document.getElementById('app-content');
     const navLinks = document.querySelectorAll('.nav-link');
+    
+    // Global Firebase variables
+    let firebaseApp, db, auth, userId, appId;
+    const MAX_RETRIES = 5;
+    
+    // Utility for exponential backoff (required for API calls)
+    const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+    // Function to initialize Firebase and sign in
+    async function initializeAppAndAuth() {
+        // setLogLevel('Debug'); // Uncomment for debugging Firestore
+        try {
+            const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+            appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+            if (!firebaseConfig || Object.keys(firebaseConfig).length === 0) {
+                console.error("Firebase configuration is missing or empty.");
+                return;
+            }
+
+            firebaseApp = initializeApp(firebaseConfig);
+            db = getFirestore(firebaseApp);
+            auth = getAuth(firebaseApp);
+
+            // Handle Authentication
+            if (typeof __initial_auth_token !== 'undefined') {
+                await signInWithCustomToken(auth, __initial_auth_token);
+                console.log("Signed in with custom token.");
+            } else {
+                await signInAnonymously(auth);
+                console.log("Signed in anonymously.");
+            }
+            
+            // Get the user ID after successful sign-in
+            userId = auth.currentUser?.uid || crypto.randomUUID();
+            console.log("Firebase initialized. User ID:", userId);
+
+        } catch (error) {
+            console.error("Firebase initialization or sign-in failed:", error);
+        }
+    }
 
     // 1. Home Page Content
     const getHomePage = () => `
@@ -274,17 +323,76 @@
     // Function to attach the form submission listener
     function attachContactFormListener() {
         const contactForm = document.querySelector('#contact-page form');
+        const nameInput = document.getElementById('name');
+        const emailInput = document.getElementById('email');
+        const interestSelect = document.getElementById('interest');
+        const messageTextarea = document.getElementById('message');
+        const submitButton = document.querySelector('#contact-page button[type="submit"]');
+
         if(contactForm) {
-            contactForm.addEventListener('submit', function(e) {
+            contactForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
                 const msgBox = document.getElementById('message-box');
                 
-                // Simulate success
-                msgBox.innerHTML = 'Thank you. Your request has been received. A senior specialist will contact you shortly.';
-                msgBox.classList.remove('hidden');
+                if (!db || !userId) {
+                    msgBox.innerHTML = 'Error: Application service not ready. Please refresh the page.';
+                    msgBox.classList.remove('hidden');
+                    msgBox.classList.remove('bg-green-950', 'text-green-300', 'border-green-700');
+                    msgBox.classList.add('bg-red-950', 'text-red-300', 'border-red-700'); // Error styling
+                    return;
+                }
+
+                // Show loading state
+                submitButton.disabled = true;
+                submitButton.textContent = 'Submitting Request...';
+                msgBox.classList.add('hidden');
                 
-                // Reset form fields
-                this.reset();
+                const formData = {
+                    name: nameInput.value,
+                    email: emailInput.value,
+                    interest: interestSelect.value,
+                    message: messageTextarea.value,
+                    timestamp: new Date().toISOString(),
+                    userId: userId
+                };
+                
+                // Firestore path: /artifacts/{appId}/users/{userId}/contact_requests
+                const collectionPath = `artifacts/${appId}/users/${userId}/contact_requests`;
+                
+                try {
+                    let docRef;
+                    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+                        try {
+                            // Attempt to save the document
+                            docRef = await addDoc(collection(db, collectionPath), formData);
+                            break; // Success!
+                        } catch (error) {
+                            if (attempt === MAX_RETRIES - 1) throw error; // Re-throw if last attempt
+                            console.warn(`Firestore write attempt ${attempt + 1} failed. Retrying in ${Math.pow(2, attempt) * 1000}ms...`);
+                            await delay(Math.pow(2, attempt) * 1000); // Exponential backoff
+                        }
+                    }
+
+                    // Success message
+                    msgBox.innerHTML = 'Thank you. Your request has been received. A senior specialist will contact you shortly.';
+                    msgBox.classList.remove('hidden');
+                    msgBox.classList.remove('bg-red-950', 'text-red-300', 'border-red-700');
+                    msgBox.classList.add('bg-green-950', 'text-green-300', 'border-green-700');
+                    
+                    // Reset form fields
+                    this.reset();
+                    
+                } catch (error) {
+                    console.error("Error submitting contact form to Firestore:", error);
+                    // Failure message
+                    msgBox.innerHTML = 'Submission failed. Please try again or contact us directly via email.';
+                    msgBox.classList.remove('hidden');
+                    msgBox.classList.remove('bg-green-950', 'text-green-300', 'border-green-700');
+                    msgBox.classList.add('bg-red-950', 'text-red-300', 'border-red-700'); // Error styling
+                } finally {
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Submit Confidential Request';
+                }
             });
         }
     }
@@ -292,8 +400,11 @@
     // Event listener for when the URL hash changes (when a link is clicked)
     window.addEventListener('hashchange', navigate);
 
-    // Initial load: Navigate to the correct page when the site loads
-    window.addEventListener('load', () => {
+    // Initial load: Navigate to the correct page and initialize Firebase
+    window.addEventListener('load', async () => {
+        // Initialize Firebase and Auth first
+        await initializeAppAndAuth(); 
+
         // For the very first load, we bypass the exit transition and just trigger the entrance
         let hash = window.location.hash.substring(1).toLowerCase() || 'home';
         const contentFunction = routes[hash] || routes['home'];
