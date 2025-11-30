@@ -9,241 +9,86 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
-    :root {
-        --gold: #d4af37;
-        --dark: #000;
-        --card-bg: rgba(255, 255, 255, 0.05);
-        --card-border: rgba(255, 255, 255, 0.1);
-    }
+:root {
+    --gold: #d4af37;
+    --dark: #000;
+    --card-bg: rgba(255, 255, 255, 0.05);
+    --card-border: rgba(255, 255, 255, 0.1);
+}
 
-    body {
-        margin: 0;
-        font-family: "Poppins", sans-serif;
-        background: var(--dark);
-        color: #fff;
-        overflow-x: hidden;
-    }
+body {
+    margin: 0;
+    font-family: "Poppins", sans-serif;
+    background: var(--dark);
+    color: #fff;
+    overflow-x: hidden;
+}
 
-    /* NAVBAR */
-    nav {
-        width: 100%;
-        position: fixed;
-        top: 0;
-        padding: 20px 50px;
-        background: rgba(0, 0, 0, 0.75);
-        backdrop-filter: blur(10px);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        z-index: 100;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    }
+/* NAVBAR */
+nav {
+    width: 100%;
+    position: fixed;
+    top: 0;
+    padding: 20px 50px;
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 100;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
 
-    nav h1 {
-        font-weight: 700;
-        font-size: 28px;
-        color: var(--gold);
-        letter-spacing: 2px;
-        cursor: pointer;
-        transition: 0.3s;
-    }
+nav h1 {
+    font-weight: 700;
+    font-size: 28px;
+    color: var(--gold);
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+nav h1:hover { transform: scale(1.05); text-shadow: 0 0 10px var(--gold); }
 
-    nav h1:hover {
-        transform: scale(1.05);
-        text-shadow: 0 0 10px var(--gold);
-    }
+nav ul { display: flex; gap: 35px; list-style: none; margin:0; padding:0; }
+nav li { font-size: 16px; cursor: pointer; position: relative; transition:0.3s; }
+nav li::after { content:""; position:absolute; bottom:-5px; left:0; width:0%; height:2px; background:var(--gold); transition:width 0.3s;}
+nav li:hover { color:var(--gold); }
+nav li:hover::after { width:100%; }
 
-    nav ul {
-        display: flex;
-        gap: 35px;
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
+/* HERO */
+.hero { padding: 220px 50px 100px; text-align:center; background: linear-gradient(to bottom,#111,#000);}
+.main-title { font-size:55px; font-weight:700; color:var(--gold); margin-bottom:0; letter-spacing:1.5px; animation: fadeSlideDown 1.2s ease forwards;}
+.sub-title { font-size:22px; font-weight:500; color:var(--gold); margin-top:5px; margin-bottom:25px; letter-spacing:6px; animation: fadeSlideDown 1.4s ease forwards;}
+.hero p { font-size:20px; max-width:800px; margin:0 auto; color:#ccc; animation: fadeIn 1.5s ease forwards; }
 
-    nav li {
-        font-size: 16px;
-        cursor: pointer;
-        position: relative;
-        transition: 0.3s;
-    }
+/* PAGES */
+.page { display:none; padding:140px 50px; min-height:100vh; }
+.active { display:block; }
+.page-title { text-align:center; color:var(--gold); font-size:40px; margin-bottom:25px; }
 
-    nav li::after {
-        content: "";
-        position: absolute;
-        bottom: -5px;
-        left: 0;
-        width: 0%;
-        height: 2px;
-        background: var(--gold);
-        transition: width 0.3s;
-    }
+/* CARDS */
+.card { background:var(--card-bg); border:1px solid var(--card-border); padding:30px; border-radius:16px; margin:25px auto; max-width:650px; box-shadow:0 10px 30px rgba(0,0,0,0.4); backdrop-filter: blur(12px); transition:0.4s ease; transform:translateY(20px); opacity:0; animation:fadeSlideUp 1s forwards; }
+.card:hover { transform:translateY(10px) scale(1.02); border-color:var(--gold); box-shadow:0 15px 40px rgba(212,175,55,0.25);}
+.card h3 { font-size:26px; margin-bottom:10px; color:var(--gold);}
+.price { font-size:30px; color:var(--gold); margin-top:15px; font-weight:600; }
+.book-btn { margin-top:20px; padding:12px 25px; background:var(--gold); color:#000; border:none; border-radius:8px; font-size:16px; font-weight:600; cursor:pointer; transition:0.3s; }
+.book-btn:hover { background:#f5d76e; transform:scale(1.05); }
 
-    nav li:hover {
-        color: var(--gold);
-    }
+/* BOOK OPTIONS */
+.book-options { display:flex; flex-direction:column; align-items:center; margin-top:50px; }
+.contact-btn { padding:15px 35px; background:var(--gold); color:#000; border:none; border-radius:10px; margin:15px 0; font-size:20px; cursor:pointer; font-weight:600; transition:0.3s; }
+.contact-btn:hover { background:#f7dd85; transform:scale(1.07); }
 
-    nav li:hover::after {
-        width: 100%;
-    }
+/* FOOTER */
+footer { background:#111; padding:40px 50px; text-align:center; border-top:1px solid #333; }
+footer h3 { color:var(--gold); font-size:22px; margin-bottom:10px; }
+footer p { color:#ccc; }
 
-    /* HERO SECTION */
-    .hero {
-        padding: 220px 50px 100px;
-        text-align: center;
-        background: linear-gradient(to bottom, #111, #000);
-    }
+/* ANIMATIONS */
+@keyframes fadeIn { from {opacity:0;} to{opacity:1;} }
+@keyframes fadeSlideUp { from {opacity:0; transform:translateY(40px);} to{opacity:1; transform:translateY(0);} }
+@keyframes fadeSlideDown { from {opacity:0; transform:translateY(-40px);} to{opacity:1; transform:translateY(0);} }
 
-    .main-title {
-        font-size: 55px;
-        font-weight: 700;
-        color: var(--gold);
-        margin-bottom: 0;
-        letter-spacing: 1.5px;
-        animation: fadeSlideDown 1.2s ease forwards;
-    }
-
-    .sub-title {
-        font-size: 22px;
-        font-weight: 500;
-        color: var(--gold);
-        margin-top: 5px;
-        margin-bottom: 25px;
-        letter-spacing: 6px;
-        animation: fadeSlideDown 1.4s ease forwards;
-    }
-
-    .hero p {
-        font-size: 20px;
-        max-width: 800px;
-        margin: 0 auto;
-        color: #ccc;
-        animation: fadeIn 1.5s ease forwards;
-    }
-
-    /* PAGE SECTION */
-    .page {
-        display: none;
-        padding: 140px 50px;
-        min-height: 100vh;
-    }
-
-    .active {
-        display: block;
-    }
-
-    /* PACKAGE CARD */
-    .card {
-        background: var(--card-bg);
-        border: 1px solid var(--card-border);
-        padding: 30px;
-        border-radius: 16px;
-        margin: 25px auto;
-        max-width: 650px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-        backdrop-filter: blur(12px);
-        transition: 0.4s ease;
-        transform: translateY(20px);
-        opacity: 0;
-        animation: fadeSlideUp 1s forwards;
-    }
-
-    .card:hover {
-        transform: translateY(10px) scale(1.02);
-        border-color: var(--gold);
-        box-shadow: 0 15px 40px rgba(212, 175, 55, 0.25);
-    }
-
-    .card h3 {
-        font-size: 26px;
-        margin-bottom: 10px;
-        color: var(--gold);
-    }
-
-    .price {
-        font-size: 30px;
-        color: var(--gold);
-        margin-top: 15px;
-        font-weight: 600;
-    }
-
-    .book-btn {
-        margin-top: 20px;
-        padding: 12px 25px;
-        background: var(--gold);
-        color: #000;
-        border: none;
-        border-radius: 8px;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: 0.3s;
-    }
-
-    .book-btn:hover {
-        background: #f5d76e;
-        transform: scale(1.05);
-    }
-
-    /* BOOK PAGE */
-    .book-options {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin-top: 50px;
-    }
-
-    .contact-btn {
-        padding: 15px 35px;
-        background: var(--gold);
-        color: #000;
-        border: none;
-        border-radius: 10px;
-        margin: 15px 0;
-        font-size: 20px;
-        cursor: pointer;
-        font-weight: 600;
-        transition: 0.3s;
-    }
-
-    .contact-btn:hover {
-        background: #f7dd85;
-        transform: scale(1.07);
-    }
-
-    /* FOOTER */
-    footer {
-        background: #111;
-        padding: 40px 50px;
-        text-align: center;
-        border-top: 1px solid #333;
-    }
-
-    footer h3 {
-        color: var(--gold);
-        font-size: 22px;
-        margin-bottom: 10px;
-    }
-
-    footer p {
-        color: #ccc;
-    }
-
-    /* ANIMATIONS */
-    @keyframes fadeIn {
-        from {opacity: 0;}
-        to {opacity: 1;}
-    }
-
-    @keyframes fadeSlideUp {
-        from {opacity: 0; transform: translateY(40px);}
-        to {opacity: 1; transform: translateY(0);}
-    }
-
-    @keyframes fadeSlideDown {
-        from {opacity: 0; transform: translateY(-40px);}
-        to {opacity: 1; transform: translateY(0);}
-    }
 </style>
 </head>
 
@@ -272,55 +117,54 @@
 
 <!-- SPECIAL PACKAGE -->
 <div id="special" class="page">
-    <h2 style="color: var(--gold); text-align:center; font-size:40px;">Special Package</h2>
+    <h2 class="page-title">Special Package</h2>
     <div class="card">
         <h3>Seasonal Exclusive Escape</h3>
         <p>Limited-time deals with unbeatable experiences.</p>
         <div class="price">$899</div>
-        <button class="book-btn" onclick="showPage('book')">Book Now</button>
+        <button class="book-btn" onclick="openBooking('Special Package')">Book Now</button>
     </div>
 </div>
 
-<!-- DIAMOND -->
+<!-- DIAMOND PACKAGE -->
 <div id="diamond" class="page">
-    <h2 style="color: var(--gold); text-align:center; font-size:40px;">Diamond Package</h2>
+    <h2 class="page-title">Diamond Package</h2>
     <div class="card">
         <h3>Diamond Elite VIP</h3>
         <p>5-star resorts, private tours, and VIP airport services.</p>
         <div class="price">$2999</div>
-        <button class="book-btn" onclick="showPage('book')">Book Now</button>
+        <button class="book-btn" onclick="openBooking('Diamond Package')">Book Now</button>
     </div>
 </div>
 
-<!-- PLATINUM -->
+<!-- PLATINUM PACKAGE -->
 <div id="platinum" class="page">
-    <h2 style="color: var(--gold); text-align:center; font-size:40px;">Platinum Package</h2>
+    <h2 class="page-title">Platinum Package</h2>
     <div class="card">
         <h3>Platinum Luxury Escape</h3>
         <p>Premium stays, curated tours & gourmet dining.</p>
         <div class="price">$1999</div>
-        <button class="book-btn" onclick="showPage('book')">Book Now</button>
+        <button class="book-btn" onclick="openBooking('Platinum Package')">Book Now</button>
     </div>
 </div>
 
-<!-- GOLD -->
+<!-- GOLD PACKAGE -->
 <div id="gold" class="page">
-    <h2 style="color: var(--gold); text-align:center; font-size:40px;">Gold Package</h2>
+    <h2 class="page-title">Gold Package</h2>
     <div class="card">
         <h3>Gold Traveler Experience</h3>
         <p>A stylish balance of comfort and affordability.</p>
         <div class="price">$1299</div>
-        <button class="book-btn" onclick="showPage('book')">Book Now</button>
+        <button class="book-btn" onclick="openBooking('Gold Package')">Book Now</button>
     </div>
 </div>
 
 <!-- BOOK NOW PAGE -->
 <div id="book" class="page">
-    <h2 style="color: var(--gold); text-align:center; font-size:40px;">Choose How to Book</h2>
-
+    <h2 class="page-title">Choose How to Book</h2>
     <div class="book-options">
-        <button class="contact-btn" onclick="window.open('https://wa.me/0000000000','_blank')">WhatsApp</button>
-        <button class="contact-btn" onclick="window.location.href='mailto:example@gmail.com'">Gmail</button>
+        <button class="contact-btn" id="whatsappBtn">WhatsApp</button>
+        <button class="contact-btn" id="gmailBtn">Gmail</button>
     </div>
 </div>
 
@@ -332,18 +176,38 @@
     <p>Location: Thimphu, Bhutan</p>
 </footer>
 
-<!-- PAGE SWITCH SCRIPT -->
 <script>
+let currentPackage = '';
+
 function showPage(id) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
+    const page = document.getElementById(id);
+    page.classList.add('active');
 
-    document.getElementById(id).querySelectorAll('.card').forEach(card => {
+    page.querySelectorAll('.card').forEach(card => {
         card.style.animation = 'none';
         void card.offsetWidth;
         card.style.animation = 'fadeSlideUp 1s forwards';
     });
 }
+
+// Open booking page and store package
+function openBooking(pkg) {
+    currentPackage = pkg;
+    showPage('book');
+}
+
+// WhatsApp & Gmail buttons
+document.getElementById('whatsappBtn').onclick = function() {
+    let message = encodeURIComponent(`Hi, I want to book the ${currentPackage}.`);
+    window.open(`https://wa.me/0000000000?text=${message}`, '_blank');
+};
+
+document.getElementById('gmailBtn').onclick = function() {
+    let subject = encodeURIComponent(`Booking Inquiry: ${currentPackage}`);
+    let body = encodeURIComponent(`Hello,\n\nI would like to book the ${currentPackage}.\n\nThanks.`);
+    window.location.href = `mailto:example@gmail.com?subject=${subject}&body=${body}`;
+};
 </script>
 
 </body>
